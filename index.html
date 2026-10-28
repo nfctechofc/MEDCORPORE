@@ -1,0 +1,1411 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Clínica Medcorpore — clínica médica. Acesse nossos canais de atendimento, agendamento e informações.">
+  <title>Medcorpore | Clínica Médica</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --primary: #24488a;
+      --primary-dark: #757e9c;
+      --primary-light: #e8f6f6;
+      --mint: #c8efdf;
+      --ink: #19333b;
+      --muted: #71858b;
+      --background: #f5faf9;
+      --white: #ffffff;
+      --border: #dcebe9;
+      --danger: #c62828;
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: "DM Sans", sans-serif;
+      color: var(--ink);
+      background: var(--background);
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible, a:focus-visible,
+    input:focus-visible, select:focus-visible {
+      outline: 3px solid #69c8ca;
+      outline-offset: 3px;
+    }
+
+    .background {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 10% 0%, #dff5ed 0%, transparent 42%),
+        radial-gradient(ellipse at 100% 65%, #e0f2f6 0%, transparent 42%),
+        #f7fbfa;
+    }
+
+    .background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .3;
+      background-image:
+        linear-gradient(#167d8909 1px, transparent 1px),
+        linear-gradient(90deg, #167d8909 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: linear-gradient(to bottom, black, transparent 75%);
+    }
+
+    .container {
+      width: min(100%, 980px);
+      margin: auto;
+      padding: 24px 20px 35px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 42px;
+    }
+
+    .session-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-right: auto;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: rgba(255,255,255,.88);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .pill:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 42px 12px 24px;
+    }
+
+    .logo-frame {
+      width: 128px;
+      height: 128px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 22px;
+      padding: 5px;
+      border: 1px solid #c9e8e1;
+      border-radius: 36px;
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 15px 45px #167d8915;
+      transform: rotate(-2deg);
+    }
+
+    .logo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      object-fit: contain;
+      transform: rotate(2deg);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid #d0ebe3;
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: #ffffffc9;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 17px 0 0;
+      font-family: Manrope, sans-serif;
+      font-size: clamp(35px, 7vw, 62px);
+      font-weight: 800;
+      letter-spacing: -2.8px;
+      line-height: 1.08;
+      color: var(--ink);
+    }
+
+    h1 span {
+      color: var(--primary);
+    }
+
+    .hero-subtitle {
+      margin: 13px 0 0;
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      max-width: 580px;
+      margin: 17px auto 0;
+      color: #647b80;
+      font-size: 14px;
+      line-height: 1.85;
+    }
+
+    .hero-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 19px;
+      color: #52746e;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .hero-note i {
+      color: var(--primary);
+    }
+
+    .admin-bar {
+      display: none;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 0 0 22px;
+    }
+
+    .admin-bar.show {
+      display: flex;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 43px;
+      padding: 12px 17px;
+      border: 0;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s, opacity .2s, background .2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: wait;
+      transform: none;
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      box-shadow: 0 7px 18px #167d8928;
+    }
+
+    .btn-secondary {
+      color: var(--primary-dark);
+      border: 1px solid var(--border);
+      background: white;
+    }
+
+    .btn-danger {
+      color: #a51f28;
+      background: #fff0f0;
+      border: 1px solid #ffd0d0;
+    }
+
+    .status {
+      min-height: 20px;
+      margin: 10px 0 17px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .status.success {
+      color: var(--primary-dark);
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin: 15px 0 16px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-family: Manrope, sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -.6px;
+    }
+
+    .section-heading p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .directories {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 16px;
+    }
+
+    .directory {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 8px 30px #153e4510;
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+      animation: appear .45s ease both;
+    }
+
+    .directory:hover {
+      border-color: #b6ded8;
+      box-shadow: 0 15px 35px #153e4517;
+      transform: translateY(-2px);
+    }
+
+    .dir-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid #edf4f2;
+      background: linear-gradient(130deg, #ffffff, #f4fbf8);
+    }
+
+    .dir-icon {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      font-size: 19px;
+    }
+
+    .dir-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dir-text h3 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .dir-text p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .count {
+      flex-shrink: 0;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: white;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .links {
+      display: grid;
+      gap: 9px;
+      padding: 12px;
+    }
+
+    .link-row {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 7px;
+    }
+
+    .link-button {
+      --link-color: var(--primary);
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      flex: 1;
+      gap: 11px;
+      padding: 14px;
+      border: 1px solid #00000008;
+      border-radius: 13px;
+      color: #fff;
+      background: var(--link-color);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 4px 12px #19333b10;
+      transition: transform .2s, filter .2s;
+    }
+
+    .link-button:hover {
+      filter: brightness(1.07);
+      transform: translateY(-2px);
+    }
+
+    .link-icon {
+      flex-shrink: 0;
+      font-size: 19px;
+    }
+
+    .link-label {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
+
+    .link-arrow {
+      flex-shrink: 0;
+      font-size: 11px;
+    }
+
+    .link-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .mini {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--primary-dark);
+      background: white;
+      cursor: pointer;
+    }
+
+    .mini:hover {
+      background: var(--primary-light);
+    }
+
+    .empty {
+      padding: 17px 10px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .loading {
+      grid-column: 1 / -1;
+      padding: 30px;
+      color: var(--primary-dark);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .contact-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 22px;
+      padding: 17px;
+      border: 1px solid #d9ebe6;
+      border-radius: 17px;
+      background: #eff8f5;
+    }
+
+    .contact-note > i {
+      margin-top: 3px;
+      color: var(--primary);
+      font-size: 19px;
+    }
+
+    .contact-note strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .contact-note p {
+      margin: 0;
+      color: #5e777a;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    footer {
+      padding: 30px 0 10px;
+      color: #829592;
+      text-align: center;
+      font-size: 10px;
+      line-height: 1.8;
+      letter-spacing: 1.4px;
+    }
+
+    .footer-brand {
+      color: var(--primary-dark);
+      font-weight: 800;
+    }
+
+    .modal {
+      width: min(460px, calc(100% - 24px));
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 21px;
+      color: var(--ink);
+      background: white;
+      box-shadow: 0 25px 80px #19333b30;
+    }
+
+    .modal::backdrop {
+      background: #122c3280;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal[open] {
+      animation: pop .2s ease both;
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to { opacity: 1; transform: none; }
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 19px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #f7fbfa;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 9px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+    }
+
+    .modal-body > p {
+      margin: 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .field input, .field select {
+      width: 100%;
+      min-height: 44px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      background: #fbfdfc;
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px #167d8912;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 9px;
+      padding: 0 20px 20px;
+    }
+
+    @media (max-width: 620px) {
+      .container {
+        padding: 16px 13px 28px;
+      }
+
+      .hero {
+        padding-top: 30px;
+      }
+
+      .logo-frame {
+        width: 108px;
+        height: 108px;
+        border-radius: 30px;
+      }
+
+      .logo {
+        border-radius: 25px;
+      }
+
+      h1 {
+        letter-spacing: -1.8px;
+      }
+
+      .intro {
+        font-size: 13px;
+      }
+
+      .directories {
+        grid-template-columns: 1fr;
+      }
+
+      .dir-head {
+        padding: 15px;
+      }
+
+      .link-button {
+        padding: 13px;
+      }
+
+      .section-heading h2 {
+        font-size: 19px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background" aria-hidden="true"></div>
+
+  <div class="container" id="app">
+    <nav class="topbar" aria-label="Área administrativa">
+      <span id="sessionLabel" class="session-label">Modo visitante</span>
+      <button id="loginBtn" class="pill" type="button">
+        <i class="fa-solid fa-lock"></i> Área administrativa
+      </button>
+      <button id="logoutBtn" class="pill hidden" type="button">
+        <i class="fa-solid fa-right-from-bracket"></i> Sair
+      </button>
+    </nav>
+
+    <header class="hero">
+      <div class="logo-frame">
+  <img
+    src="img\Gemini_Generated_Image_ck5moick5moick5m.jpg"
+    alt="Logo da Clínica Medcorpore"
+    class="logo"
+    onerror="this.onerror=null;this.src='img/logo-medcorpore.jpg';"
+  >
+</div>
+
+      <div class="eyebrow">
+        <i class="fa-solid fa-heart-pulse"></i>
+        Clínica médica
+      </div>
+
+      <h1><span>MED CORPORE</span></h1>
+      <p class="hero-subtitle">MEDICINA DO TRABALHO</p>
+
+      <p class="intro">
+        Seu bem-estar começa com o cuidado certo.
+        Encontre nossos canais de atendimento, informações e serviços
+        em um único lugar.
+      </p>
+
+      <div class="hero-note">
+        <i class="fa-solid fa-circle-check"></i>
+        Acesse nossos canais oficiais
+      </div>
+    </header>
+
+    <div id="adminBar" class="admin-bar">
+      <button id="addBtn" class="btn btn-primary" type="button">
+        <i class="fa-solid fa-plus"></i> Adicionar link
+      </button>
+      <button id="refreshBtn" class="btn btn-secondary" type="button">
+        <i class="fa-solid fa-rotate"></i> Atualizar lista
+      </button>
+    </div>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <div class="section-heading">
+      <div>
+        <h2>Nossos canais</h2>
+        <p>Encontre rapidamente o que você precisa.</p>
+      </div>
+      <i class="fa-solid fa-arrow-down" style="color:var(--primary)"></i>
+    </div>
+
+    <main id="directories" class="directories">
+      <div class="loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Carregando canais da clínica...
+      </div>
+    </main>
+
+    <aside class="contact-note">
+      <i class="fa-solid fa-shield-heart"></i>
+      <div>
+        <strong>Sua saúde merece atenção.</strong>
+        <p>
+          Utilize os canais oficiais da clínica para informações e
+          agendamentos. Em caso de emergência, procure um serviço
+          de urgência ou ligue para o SAMU (192).
+        </p>
+      </div>
+    </aside>
+
+    <footer>
+      <span class="footer-brand">MEDCORPORE</span><br>
+      CLÍNICA MÉDICA · CUIDADO · MEDICINA DO TRABALHO<br>
+      <span id="year"></span>
+    </footer>
+  </div>
+
+  <!-- Modal de login -->
+  <dialog class="modal" id="loginModal">
+    <form id="loginForm">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-user-shield"></i> Acesso administrativo</h3>
+        <button type="button" class="close-btn" data-close="loginModal"
+          aria-label="Fechar">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="hint">
+          Entre com o e-mail e a senha cadastrados no Supabase.
+        </p>
+
+        <div class="field">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" autocomplete="username"
+            required>
+        </div>
+
+        <div class="field">
+          <label for="loginPassword">Senha</label>
+          <input id="loginPassword" type="password"
+            autocomplete="current-password" required>
+        </div>
+
+        <p id="loginError" class="status error" aria-live="polite"></p>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary"
+          data-close="loginModal">Cancelar</button>
+        <button id="loginSubmit" class="btn btn-primary" type="submit">
+          Entrar
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal para adicionar e editar links -->
+  <dialog class="modal" id="linkModal">
+    <form id="linkForm">
+      <div class="modal-head">
+        <h3 id="linkModalTitle">Adicionar canal</h3>
+        <button type="button" class="close-btn" data-close="linkModal"
+          aria-label="Fechar">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="field">
+          <label for="category">Categoria</label>
+          <select id="category" required>
+            
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Sites Web">Site oficial</option>
+            <option value="Localização">Localização</option>
+            <option value="AVALIAÇÃO DO GOOGLE">Avaliação do Google</option>
+            <option value="Facebook">Facebook</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="linkName">Nome do canal</label>
+          <input id="linkName" maxlength="100"
+            placeholder="Ex.: Agende sua consulta" required>
+        </div>
+
+        <div class="field">
+          <label for="linkUrl">Endereço do link</label>
+          <input id="linkUrl" type="url" maxlength="2000"
+            placeholder="https://..." required>
+        </div>
+
+        <p class="hint">
+          Informe o endereço completo começando com https:// ou http://.
+        </p>
+
+        <p id="linkError" class="status error" aria-live="polite"></p>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary"
+          data-close="linkModal">Cancelar</button>
+        <button id="linkSubmit" class="btn btn-primary" type="submit">
+          Salvar canal
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    "use strict";
+
+    // Mantenha os dados do seu projeto Supabase.
+    const SUPABASE_URL =
+      "https://jtlbppqxdvjjrsmqgrdu.supabase.co";
+
+    const SUPABASE_PUBLIC_KEY =
+      "sb_publishable_fZbzZDiG3aonEim1f0M0XQ_YT5o3uuU";
+
+    // Troque pelo e-mail autorizado a administrar a clínica.
+    // Deve ser exatamente o e-mail cadastrado no Supabase Auth.
+    const ADMIN_EMAIL = "kevinbauer@gmail.com";
+
+    const TABLE = "meus_links";
+
+    const { createClient } = supabase;
+
+    const db = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+
+    const categories = [
+      
+      {
+        name: "WhatsApp",
+        icon: "fa-brands fa-whatsapp",
+        description: "Atendimento e informações"
+      },
+      {
+        name: "Instagram",
+        icon: "fa-brands fa-instagram",
+        description: "Novidades e conteúdos"
+      },
+      {
+        name: "Facebook",
+        icon: "fa-brands fa-facebook-f",
+        description: "Página e publicações"
+      },
+      {
+        name: "Sites Web",
+        icon: "fa-solid fa-globe",
+        description: "Site e informações oficiais"
+      },
+      {
+        name: "Localização",
+        icon: "fa-solid fa-location-dot",
+        description: "Como chegar à clínica"
+      },
+      {
+        name: "AVALIAÇÃO DO GOOGLE",
+        icon: "fa-brands fa-google",
+        description: "Avaliações e opiniões"
+      },
+    
+    ];
+
+    const colors = {
+      "Agendamento": "#167d89",
+      "WhatsApp": "#168b60",
+      "Instagram": "linear-gradient(110deg,#833ab4,#e1306c,#f77737)",
+      "Sites Web": "#235c69",
+      "Localização": "#447b70",
+      "AVALIAÇÃO DO GOOGLE": "#455d69",
+      "Facebook": "#1877f2"
+    };
+
+    let currentUser = null;
+    let links = [];
+    let editingId = null;
+    let loadingLinks = false;
+
+    const $ = id => document.getElementById(id);
+
+    $("year").textContent = new Date().getFullYear();
+
+    function setStatus(message = "", type = "") {
+      const el = $("status");
+      el.textContent = message;
+      el.classList.remove("error", "success");
+
+      if (type) el.classList.add(type);
+    }
+
+    function setModalError(id, message = "") {
+      $(id).textContent = message;
+    }
+
+    function safeUrl(raw) {
+      try {
+        const url = new URL(raw.trim());
+
+        if (!["http:", "https:"].includes(url.protocol)) {
+          return null;
+        }
+
+        return url.href;
+      } catch {
+        return null;
+      }
+    }
+
+    function showModal(id) {
+      const dialog = $(id);
+      if (!dialog.open) dialog.showModal();
+    }
+
+    function closeModal(id) {
+      const dialog = $(id);
+      if (dialog.open) dialog.close();
+    }
+
+    document.querySelectorAll("[data-close]").forEach(button => {
+      button.addEventListener("click", () => {
+        closeModal(button.dataset.close);
+      });
+    });
+
+    // Fecha o modal quando o usuário clica fora do seu conteúdo.
+    document.querySelectorAll("dialog.modal").forEach(dialog => {
+      dialog.addEventListener("click", event => {
+        if (event.target === dialog) closeModal(dialog.id);
+      });
+    });
+
+    function render() {
+      const root = $("directories");
+      root.replaceChildren();
+
+      categories.forEach((category, index) => {
+        const items = links.filter(
+          link => link.categoria === category.name
+        );
+
+        const section = document.createElement("section");
+        section.className = "directory";
+        section.style.animationDelay = `${Math.min(index * 60, 360)}ms`;
+
+        const head = document.createElement("div");
+        head.className = "dir-head";
+
+        const iconBox = document.createElement("div");
+        iconBox.className = "dir-icon";
+
+        const icon = document.createElement("i");
+        icon.className = category.icon;
+        iconBox.append(icon);
+
+        const info = document.createElement("div");
+        info.className = "dir-text";
+
+        const title = document.createElement("h3");
+        title.textContent = category.name;
+
+        const description = document.createElement("p");
+        description.textContent = category.description;
+
+        info.append(title, description);
+
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent =
+          `${items.length} ${items.length === 1 ? "link" : "links"}`;
+
+        head.append(iconBox, info, count);
+
+        const list = document.createElement("div");
+        list.className = "links";
+
+        if (items.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = currentUser
+            ? "Nenhum link cadastrado. Use “Adicionar link” para incluir um."
+            : "Os links desta categoria estarão disponíveis aqui.";
+          list.append(empty);
+        }
+
+        items.forEach(link => {
+          const row = document.createElement("div");
+          row.className = "link-row";
+
+          const open = document.createElement("a");
+          open.className = "link-button";
+          open.href = link.url;
+          open.target = "_blank";
+          open.rel = "noopener noreferrer";
+          open.style.setProperty(
+            "--link-color",
+            colors[category.name] || "#455d69"
+          );
+          open.setAttribute("aria-label", `Acessar ${link.nome}`);
+
+          const linkIcon = document.createElement("i");
+          linkIcon.className = `${category.icon} link-icon`;
+
+          const label = document.createElement("span");
+          label.className = "link-label";
+          label.textContent = link.nome;
+
+          const arrow = document.createElement("i");
+          arrow.className = "fa-solid fa-arrow-up-right-from-square link-arrow";
+
+          open.append(linkIcon, label, arrow);
+          row.append(open);
+
+          if (currentUser) {
+            const actions = document.createElement("div");
+            actions.className = "link-actions";
+
+            const edit = document.createElement("button");
+            edit.type = "button";
+            edit.className = "mini";
+            edit.title = "Editar link";
+            edit.setAttribute("aria-label", `Editar ${link.nome}`);
+
+            const editIcon = document.createElement("i");
+            editIcon.className = "fa-solid fa-pen";
+            edit.append(editIcon);
+            edit.addEventListener("click", () => openEdit(link));
+
+            const del = document.createElement("button");
+            del.type = "button";
+            del.className = "mini";
+            del.title = "Excluir link";
+            del.setAttribute("aria-label", `Excluir ${link.nome}`);
+
+            const deleteIcon = document.createElement("i");
+            deleteIcon.className = "fa-solid fa-trash";
+            del.append(deleteIcon);
+            del.addEventListener("click", () => deleteLink(link));
+
+            actions.append(edit, del);
+            row.append(actions);
+          }
+
+          list.append(row);
+        });
+
+        section.append(head, list);
+        root.append(section);
+      });
+
+      $("adminBar").classList.toggle("show", Boolean(currentUser));
+      $("loginBtn").classList.toggle("hidden", Boolean(currentUser));
+      $("logoutBtn").classList.toggle("hidden", !currentUser);
+
+      $("sessionLabel").textContent = currentUser
+        ? "Administrador conectado"
+        : "Bem-vindo à Medcorpore";
+    }
+
+    async function loadLinks() {
+      if (loadingLinks) return;
+
+      loadingLinks = true;
+      setStatus("");
+
+      $("directories").innerHTML =
+        '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando canais da clínica...</div>';
+
+      try {
+        const { data, error } = await db
+          .from(TABLE)
+          .select("id,categoria,nome,url,criado_em")
+          .order("criado_em", { ascending: true });
+
+        if (error) throw error;
+
+        links = (data || []).filter(link => {
+          return (
+            typeof link.categoria === "string" &&
+            typeof link.nome === "string" &&
+            typeof link.url === "string" &&
+            safeUrl(link.url) !== null
+          );
+        });
+
+        render();
+      } catch (error) {
+        $("directories").replaceChildren();
+
+        const message = document.createElement("div");
+        message.className = "loading";
+        message.textContent =
+          "Não foi possível carregar os links. Verifique a tabela, as permissões RLS e a conexão com o Supabase.";
+
+        $("directories").append(message);
+
+        setStatus(
+          `Erro ao carregar os links: ${error.message || "erro desconhecido"}`,
+          "error"
+        );
+      } finally {
+        loadingLinks = false;
+      }
+    }
+
+    function openLogin() {
+      $("loginForm").reset();
+      setModalError("loginError");
+      showModal("loginModal");
+    }
+
+    $("loginBtn").addEventListener("click", openLogin);
+
+    $("logoutBtn").addEventListener("click", async () => {
+      $("logoutBtn").disabled = true;
+
+      try {
+        const { error } = await db.auth.signOut();
+        if (error) throw error;
+
+        setStatus("Você saiu da área administrativa.", "success");
+      } catch (error) {
+        setStatus(`Não foi possível sair: ${error.message}`, "error");
+      } finally {
+        $("logoutBtn").disabled = false;
+      }
+    });
+
+    $("loginForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const submit = $("loginSubmit");
+      submit.disabled = true;
+      setModalError("loginError");
+
+      const email = $("loginEmail").value.trim().toLowerCase();
+      const password = $("loginPassword").value;
+
+      if (email !== ADMIN_EMAIL.toLowerCase()) {
+        setModalError(
+          "loginError",
+          "Este e-mail não está autorizado a administrar o site."
+        );
+        submit.disabled = false;
+        return;
+      }
+
+      try {
+        const { data, error } = await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        if (
+          !data.user ||
+          data.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()
+        ) {
+          await db.auth.signOut();
+          throw new Error("Conta não autorizada.");
+        }
+
+        currentUser = data.user;
+        closeModal("loginModal");
+        render();
+        setStatus("Login realizado com sucesso.", "success");
+        await loadLinks();
+      } catch (error) {
+        setModalError(
+          "loginError",
+          error.message === "Invalid login credentials"
+            ? "E-mail ou senha incorretos."
+            : `Não foi possível entrar: ${error.message}`
+        );
+      } finally {
+        submit.disabled = false;
+      }
+    });
+
+    $("addBtn").addEventListener("click", () => {
+      editingId = null;
+      $("linkForm").reset();
+      $("linkModalTitle").textContent = "Adicionar canal";
+      $("linkSubmit").textContent = "Salvar canal";
+      setModalError("linkError");
+      showModal("linkModal");
+    });
+
+    $("refreshBtn").addEventListener("click", loadLinks);
+
+    function openEdit(link) {
+      editingId = link.id;
+
+      $("linkForm").reset();
+
+      const categoryExists = [...$("category").options].some(
+        option => option.value === link.categoria
+      );
+
+      if (!categoryExists) {
+        const option = document.createElement("option");
+        option.value = link.categoria;
+        option.textContent = link.categoria;
+        $("category").append(option);
+      }
+
+      $("category").value = link.categoria;
+      $("linkName").value = link.nome;
+      $("linkUrl").value = link.url;
+
+      $("linkModalTitle").textContent = "Editar canal";
+      $("linkSubmit").textContent = "Salvar alterações";
+      setModalError("linkError");
+
+      showModal("linkModal");
+    }
+
+    $("linkForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (!currentUser) {
+        setModalError(
+          "linkError",
+          "Entre como administrador para salvar alterações."
+        );
+        return;
+      }
+
+      const categoria = $("category").value;
+      const nome = $("linkName").value.trim();
+      const url = safeUrl($("linkUrl").value);
+
+      if (!nome) {
+        setModalError("linkError", "Informe o nome do canal.");
+        return;
+      }
+
+      if (!url) {
+        setModalError(
+          "linkError",
+          "Informe uma URL válida iniciada com http:// ou https://."
+        );
+        return;
+      }
+
+      const submit = $("linkSubmit");
+      submit.disabled = true;
+      setModalError("linkError");
+
+      try {
+        const payload = { categoria, nome, url };
+
+        const result = editingId === null
+          ? await db.from(TABLE).insert(payload)
+          : await db.from(TABLE).update(payload).eq("id", editingId);
+
+        if (result.error) throw result.error;
+
+        closeModal("linkModal");
+        editingId = null;
+
+        setStatus("Canal salvo com sucesso.", "success");
+        await loadLinks();
+      } catch (error) {
+        setModalError(
+          "linkError",
+          `Erro ao salvar: ${error.message || "verifique as permissões do Supabase."}`
+        );
+      } finally {
+        submit.disabled = false;
+      }
+    });
+
+    async function deleteLink(link) {
+      if (!currentUser) return;
+
+      const confirmed = confirm(
+        `Deseja realmente excluir o link "${link.nome}"?`
+      );
+
+      if (!confirmed) return;
+
+      try {
+        const { error } = await db
+          .from(TABLE)
+          .delete()
+          .eq("id", link.id);
+
+        if (error) throw error;
+
+        setStatus("Link excluído com sucesso.", "success");
+        await loadLinks();
+      } catch (error) {
+        setStatus(
+          `Erro ao excluir o link: ${error.message || "verifique as permissões."}`,
+          "error"
+        );
+      }
+    }
+
+    // Atualiza a interface quando o estado de autenticação muda.
+    db.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user || null;
+
+      currentUser =
+        user &&
+        user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+          ? user
+          : null;
+
+      render();
+    });
+
+    // Restaura a sessão ao abrir ou atualizar a página.
+    (async function init() {
+      try {
+        const { data, error } = await db.auth.getSession();
+
+        if (error) throw error;
+
+        const user = data.session?.user || null;
+
+        currentUser =
+          user &&
+          user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+            ? user
+            : null;
+
+        await loadLinks();
+      } catch (error) {
+        $("directories").replaceChildren();
+
+        const message = document.createElement("div");
+        message.className = "loading";
+        message.textContent =
+          "Não foi possível iniciar a página. Verifique a conexão com o Supabase.";
+
+        $("directories").append(message);
+
+        setStatus(
+          `Erro de inicialização: ${error.message || "erro desconhecido"}`,
+          "error"
+        );
+      }
+    })();
+  </script>
+</body>
+</html>
