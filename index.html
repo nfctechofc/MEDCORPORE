@@ -60,28 +60,38 @@
       outline-offset: 3px;
     }
 
-    .background {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse at 10% 0%, #dff5ed 0%, transparent 42%),
-        radial-gradient(ellipse at 100% 65%, #e0f2f6 0%, transparent 42%),
-        #f7fbfa;
-    }
+    
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 10% 0%, #dff5ed 0%, transparent 42%),
+    radial-gradient(ellipse at 100% 65%, #e0f2f6 0%, transparent 42%),
+    #f7fbfa;
+}
 
-    .background::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      opacity: .3;
-      background-image:
-        linear-gradient(#167d8909 1px, transparent 1px),
-        linear-gradient(90deg, #167d8909 1px, transparent 1px);
-      background-size: 38px 38px;
-      mask-image: linear-gradient(to bottom, black, transparent 75%);
-    }
+#patternWaves {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0.48;
+}
+
+/* Mantém os cartões e textos legíveis */
+.directory,
+.contact-note {
+  backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #patternWaves {
+    opacity: 0.2;
+  }
+}
+
 
     .container {
       width: min(100%, 980px);
@@ -314,28 +324,36 @@
     }
 
     .directories {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: start;
-      gap: 16px;
-    }
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
 
-    .directory {
-      min-width: 0;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 8px 30px #153e4510;
-      transition: border-color .25s, box-shadow .25s, transform .25s;
-      animation: appear .45s ease both;
-    }
+.directory {
+  min-width: 0;
+  overflow: hidden;
 
-    .directory:hover {
-      border-color: #b6ded8;
-      box-shadow: 0 15px 35px #153e4517;
-      transform: translateY(-2px);
-    }
+  /* Borda azul */
+  border: 3px solid rgba(12, 26, 48, 0.4);
+  border-radius: var(--radius);
+
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 30px rgba(21, 62, 69, 0.06);
+
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s,
+    transform 0.25s;
+
+  animation: appear 0.45s ease both;
+}
+
+.directory:hover {
+  border-color: #082653;
+  box-shadow: 0 0 18px rgba(80, 150, 255, 0.2);
+  transform: translateY(-2px);
+}
 
     .dir-head {
       display: flex;
@@ -690,7 +708,9 @@
 </head>
 
 <body>
-  <div class="background" aria-hidden="true"></div>
+<div class="background" aria-hidden="true">
+  <canvas id="patternWaves" aria-hidden="true"></canvas>
+</div>
 
   <div class="container" id="app">
     <nav class="topbar" aria-label="Área administrativa">
@@ -706,7 +726,7 @@
     <header class="hero">
       <div class="logo-frame">
   <img
-    src="Gemini_Generated_Image_ck5moick5moick5m.jpg"
+    src="img\Gemini_Generated_Image_ck5moick5moick5m.jpg"
     alt="Logo da Clínica Medcorpore"
     class="logo"
     onerror="this.onerror=null;this.src='img/logo-medcorpore.jpg';"
@@ -1406,6 +1426,134 @@
         );
       }
     })();
+
+    
+(() => {
+  const canvas = document.getElementById("patternWaves");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  let width = 0;
+  let height = 0;
+  let animationId = 0;
+  let time = 0;
+  let lastTime = 0;
+
+  const pointer = {
+    x: -1000,
+    y: -1000,
+    active: false
+  };
+
+  const spacing = 17;
+  const color = "80, 150, 255";
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+    width = rect.width;
+    height = rect.height;
+
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function draw(now = 0) {
+    if (!ctx || !width || !height) return;
+
+    if (!reducedMotion && lastTime) {
+      time += Math.min((now - lastTime) / 1000, 0.05);
+    }
+
+    lastTime = now;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const gap = spacing;
+    const cols = Math.ceil(width / gap);
+    const rows = Math.ceil(height / gap);
+
+    for (let row = 0; row <= rows; row++) {
+      for (let col = 0; col <= cols; col++) {
+        const x = col * gap;
+        const y = row * gap;
+
+        const nx = x / width;
+        const ny = y / height;
+
+        const waveA =
+          Math.sin(nx * 9 + time * 0.42 + Math.sin(ny * 5)) * 5;
+
+        const waveB =
+          Math.sin(ny * 10 - time * 0.3 + nx * 3) * 4;
+
+        let dx = x;
+        let dy = y + waveA + waveB;
+
+        if (pointer.active) {
+          const vx = x - pointer.x;
+          const vy = y - pointer.y;
+          const distance = Math.hypot(vx, vy);
+          const radius = 145;
+
+          if (distance < radius && distance > 0) {
+            const influence = (1 - distance / radius) ** 2;
+            dx += (vx / distance) * influence * 11;
+            dy += (vy / distance) * influence * 11;
+          }
+        }
+
+        const wave =
+          Math.sin(nx * 12 + ny * 7 + time * 0.5) +
+          Math.cos(ny * 11 - nx * 4 - time * 0.35);
+
+        const brightness = Math.max(0, Math.min(1, (wave + 2) / 4));
+        const radius = 0.6 + brightness * 1.15;
+        const alpha = 0.08 + brightness * 0.28;
+        const color = "80, 150, 255";
+        ctx.beginPath();
+        ctx.arc(dx, dy, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color}, ${alpha})`;
+        ctx.fill();
+      }
+    }
+
+    if (!reducedMotion) {
+      animationId = requestAnimationFrame(draw);
+    }
+  }
+
+  canvas.addEventListener("pointermove", event => {
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = event.clientX - rect.left;
+    pointer.y = event.clientY - rect.top;
+    pointer.active = true;
+  });
+
+  canvas.addEventListener("pointerleave", () => {
+    pointer.active = false;
+  });
+
+  window.addEventListener("resize", resize);
+
+  resize();
+
+  if (!reducedMotion) {
+    cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(draw);
+  }
+})();
+
   </script>
 </body>
 </html>
